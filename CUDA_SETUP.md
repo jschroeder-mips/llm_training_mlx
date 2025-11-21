@@ -69,55 +69,59 @@ git clone https://github.com/jschroeder-mips/llm_training_mlx.git
 cd llm_training_mlx
 ```
 
-### 2. Create Virtual Environment
-**Windows:**
-```powershell
-python -m venv venv_cuda
-.\venv_cuda\Scripts\activate
-```
+### 2. Install uv (Recommended)
 
-**Linux:**
+`uv` simplifies dependency management by reading inline script metadata (PEP 722).
+
+**Linux/macOS:**
 ```bash
-python3 -m venv venv_cuda
-source venv_cuda/bin/activate
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 3. Install PyTorch with CUDA Support
+**Windows PowerShell:**
+```powershell
+irm https://astral.sh/uv/install.ps1 | iex
+```
 
-**For CUDA 11.8:**
+Verify installation:
+```bash
+uv --version
+```
+
+### 3. Verify CUDA & PyTorch
+
+Since PyTorch with CUDA support is large (~2GB), you'll want to install it manually first to choose the right CUDA version.
+
+**Check your CUDA version:**
+```bash
+nvidia-smi
+# Look for "CUDA Version: 12.1" or similar
+```
+
+**Install PyTorch:**
+
+For CUDA 11.8:
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
-**For CUDA 12.1:**
+For CUDA 12.1:
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
-**Verify CUDA installation:**
-```python
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else "None"}')"
+**Verify CUDA is working:**
+```bash
+python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}'); print(f'GPU: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else \"None\"}')"
 ```
 
-You should see:
+Expected output:
 ```
 CUDA available: True
 GPU: NVIDIA GeForce RTX 4090
 ```
 
-### 4. Install Training Dependencies
-```bash
-pip install transformers>=4.34.0 peft>=0.5.0 datasets>=2.14.0
-pip install bitsandbytes>=0.41.0 accelerate>=0.23.0
-pip install sentencepiece protobuf python-dotenv
-```
-
-**Windows Note**: If `bitsandbytes` installation fails on Windows, use:
-```powershell
-pip install bitsandbytes-windows
-```
-
-### 5. Set Up Hugging Face Authentication
+### 4. Set Up Hugging Face Authentication
 
 **Option A: Environment Variable**
 ```bash
@@ -139,7 +143,19 @@ Get your token from: https://huggingface.co/settings/tokens
 ## Training
 
 ### Run Training Script
+
+The script uses PEP 722 inline dependencies, so `uv` will automatically install everything needed:
+
 ```bash
+uv run train_cuda.py
+```
+
+**Note**: The first run will install dependencies (~2GB for PyTorch if not already installed). Subsequent runs will be instant.
+
+**Alternative without uv:**
+If you prefer traditional pip, dependencies are listed at the top of `train_cuda.py`:
+```bash
+pip install torch>=2.0.0 transformers>=4.34.0 peft>=0.5.0 datasets>=2.14.0 bitsandbytes>=0.41.0 accelerate>=0.23.0 python-dotenv sentencepiece protobuf
 python train_cuda.py
 ```
 
@@ -188,11 +204,19 @@ Loss should decrease from ~4.0 to ~1.0.
 
 ### Interactive Testing
 ```bash
+# With uv (recommended)
+uv run inference_cuda.py
+
+# Or with python directly
 python inference_cuda.py
 ```
 
 Or specify adapter path:
 ```bash
+# With uv
+uv run inference_cuda.py --adapter_path ./adapters_cuda/final
+
+# Or with python
 python inference_cuda.py --adapter_path ./adapters_cuda/final
 ```
 

@@ -1,3 +1,18 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "torch>=2.0.0",
+#     "transformers>=4.34.0",
+#     "peft>=0.5.0",
+#     "datasets>=2.14.0",
+#     "bitsandbytes>=0.41.0",
+#     "accelerate>=0.23.0",
+#     "python-dotenv",
+#     "sentencepiece",
+#     "protobuf",
+# ]
+# ///
+
 """
 Fine-tune Mistral-7B-Instruct-v0.3 for RISC-V assembly generation using LoRA on NVIDIA GPUs.
 
@@ -9,12 +24,8 @@ Requirements:
 - CUDA 11.8+ and compatible PyTorch
 - Python 3.10+
 
-Installation:
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-    pip install transformers peft datasets bitsandbytes accelerate python-dotenv sentencepiece
-
 Usage:
-    python train_cuda.py
+    uv run train_cuda.py
 
 Expected training time:
 - RTX 4090: ~15-20 minutes (600 iterations)

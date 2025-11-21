@@ -1,15 +1,23 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "torch>=2.0.0",
+#     "transformers>=4.34.0",
+#     "peft>=0.5.0",
+#     "python-dotenv",
+#     "sentencepiece",
+# ]
+# ///
+
 """
 Interactive inference script for CUDA/PyTorch fine-tuned RISC-V model.
 
 This script loads the fine-tuned LoRA adapters and provides an interactive
 interface for generating RISC-V assembly instructions.
 
-Requirements:
-    pip install torch transformers peft python-dotenv
-
 Usage:
-    python inference_cuda.py
-    python inference_cuda.py --adapter_path ./adapters_cuda/final
+    uv run inference_cuda.py
+    uv run inference_cuda.py --adapter_path ./adapters_cuda/final
 """
 
 import argparse
