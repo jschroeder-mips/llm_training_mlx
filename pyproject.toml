@@ -1,0 +1,7 @@
+[project]
+name = "llm-training-mlx"
+version = "0.1.0"
+description = "LoRA fine-tuning of Mistral 7B with MLX"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
