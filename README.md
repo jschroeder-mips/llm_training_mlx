@@ -2,6 +2,11 @@
 
 A practical guide to fine-tuning large language models (LLMs) on Apple Silicon. This project demonstrates how to specialize `mistralai/Mistral-7B-Instruct-v0.3` (a general-purpose 7 billion parameter model) into a RISC-V assembly code assistant using parameter-efficient fine-tuning.
 
+**📱 Platform Support:**
+- **Apple Silicon** (M1/M2/M3/M4): Use `train_mlx.py` with MLX framework → [See instructions below](#setup)
+- **NVIDIA GPUs** (Windows/Linux): Use `train_cuda.py` with PyTorch → [See CUDA_SETUP.md](CUDA_SETUP.md)
+- **Google Colab** (Free/Pro): Use `train_colab.ipynb` notebook → [Open in Colab](https://colab.research.google.com/github/jschroeder-mips/llm_training_mlx/blob/main/train_colab.ipynb)
+
 ## What is Fine-Tuning?
 
 **Fine-tuning** adapts a pre-trained model to perform specialized tasks by training it on domain-specific data. Instead of training a model from scratch (which requires massive compute and data), you start with a capable foundation model and teach it new skills.
@@ -421,7 +426,19 @@ After training, test with diverse inputs to verify the model learned correctly. 
 - **MLX-LM Guide**: https://github.com/ml-explore/mlx-examples/tree/main/llms
 - **LoRA Paper**: https://arxiv.org/abs/2106.09685
 - **Hugging Face Datasets**: https://huggingface.co/datasets
+- **CUDA/PyTorch Setup**: [CUDA_SETUP.md](CUDA_SETUP.md) - For Windows/Linux with NVIDIA GPUs
+- **Google Colab Notebook**: [train_colab.ipynb](train_colab.ipynb) - Run in browser with free GPU
 - **This Repo**: https://github.com/jschroeder-mips/llm_training_mlx
+
+## Platform Comparison
+
+| Platform | Script | Hardware | Training Time | Setup Complexity |
+|----------|--------|----------|---------------|------------------|
+| **Apple Silicon** | `train_mlx.py` | M1/M2/M3/M4 Mac | ~25-35 min | ⭐ Easy (uv run) |
+| **NVIDIA GPU** | `train_cuda.py` | RTX 3090/4090, A100 | ~15-30 min | ⭐⭐ Medium (CUDA setup) |
+| **Google Colab** | `train_colab.ipynb` | T4/V100/A100 (cloud) | ~20-60 min | ⭐ Easy (browser) |
+
+All platforms produce equivalent results. Choose based on your available hardware.
 
 ## License
 
