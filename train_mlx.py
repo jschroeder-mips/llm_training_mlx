@@ -71,22 +71,34 @@ with open("valid.jsonl", "w") as f:
 # --- 2. Training ---
 print("Starting training on Metal (M4)...")
 
+# Create a YAML configuration file for mlx_lm.lora
+# This allows us to specify advanced LoRA settings like target modules.
+config_content = f"""
+model: {MODEL_NAME}
+train: true
+data: .
+batch_size: 4
+iters: 600
+learning_rate: 1e-5
+steps_per_eval: 50
+adapter_path: {ADAPTER_FILE}
+save_every: 100
+num_layers: -1  # -1 means all layers
+lora_parameters:
+  rank: 16
+  alpha: 16
+  dropout: 0.0
+  keys: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+"""
+
+with open("lora_config.yaml", "w") as f:
+    f.write(config_content)
+
 # We use subprocess to call mlx_lm.lora directly.
 # This avoids internal API instability and manages memory better.
-# We target all linear layers for better quality.
 cmd = [
     sys.executable, "-m", "mlx_lm.lora",
-    "--model", MODEL_NAME,
-    "--train",
-    "--data", ".", # Directory containing train.jsonl and valid.jsonl
-    "--batch-size", "4",
-    "--lora-layers", "16", # Number of layers to adapt (default is -1 for all, but let's be explicit or use default)
-    "--target-modules", "q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj",
-    "--iters", "600",
-    "--learning-rate", "1e-5",
-    "--steps-per-eval", "50",
-    "--adapter-path", ADAPTER_FILE,
-    "--save-every", "100",
+    "--config", "lora_config.yaml"
 ]
 
 print(f"Running command: {' '.join(cmd)}")
