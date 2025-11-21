@@ -2,7 +2,7 @@ Project Context: RISC-V LLM Fine-Tuning on Apple Silicon
 
 1. Project Goal
 
-The objective is to fine-tune a DeepSeek-Coder-7B model to function as a specialized RISC-V assembly code generator. The model should accept natural language descriptions of operations and output the corresponding valid RISC-V assembly instructions.
+The objective is to fine-tune a Mistral-7B-Instruct-v0.3 model to function as a specialized RISC-V assembly code generator. The model should accept natural language descriptions of operations and output the corresponding valid RISC-V assembly instructions.
 
 2. Environment & Hardware
 
@@ -48,7 +48,7 @@ The core training logic is encapsulated in train_mlx.py.
 
 Key Configurations
 
-Base Model: deepseek-ai/deepseek-coder-6.7b-instruct
+Base Model: mistralai/Mistral-7B-Instruct-v0.3
 
 LoRA Configuration:
 
@@ -56,7 +56,7 @@ Rank (r): 16
 
 Alpha: 16
 
-Target Modules: q_proj, v_proj (and potentially others if memory permits).
+Target Modules: q_proj, v_proj, k_proj, o_proj, gate_proj, up_proj, down_proj (all linear layers).
 
 Training Parameters:
 
@@ -70,13 +70,9 @@ Optimizer: Default MLX optimizer (AdamW equivalent).
 
 Workflow
 
-Load & Quantize: Load DeepSeek 7B in 4-bit mode using mlx_lm.load().
-
 Data Prep: Download dataset, format prompts, and save as train.jsonl and valid.jsonl.
 
-LoRA Adaptation: Freeze base model, attach LoRA adapters to linear layers.
-
-Train: Execute training loop using mlx_lm.train().
+Train: Execute training loop using mlx_lm.lora (via subprocess).
 
 Save: Export adapters to adapters.npz.
 
@@ -100,4 +96,4 @@ Memory Management: If Out-Of-Memory (OOM) occurs, suggest reducing batch_size or
 pip install mlx mlx-lm datasets
 
 # Run Training
-python train_mlx.py
+uv run train_mlx.py

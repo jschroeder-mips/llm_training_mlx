@@ -48,6 +48,7 @@ uv --version
 3. (Optional) Persist the token across sessions:
 	- macOS/Linux: add the export line to `~/.zshrc` or `~/.bashrc`
 	- Windows: `setx HF_TOKEN "hf_your_token"`
+4. You can also create a `.env` file in the repo root containing `HF_TOKEN=hf_your_token`; the training script loads it automatically via `python-dotenv`.
 
 Once authenticated, uv will download models and datasets through the Hugging Face cache (`~/.cache/huggingface`).
 

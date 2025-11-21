@@ -4,14 +4,17 @@
 #     "mlx",
 #     "mlx-lm",
 #     "datasets",
+#     "python-dotenv",
 # ]
 # ///
 
 import json
+import subprocess
+import sys
 
 from datasets import load_dataset
-from mlx_lm import generate, load, train
-from mlx_lm.tuner.utils import linear_to_lora_layers
+from dotenv import load_dotenv
+from mlx_lm import generate, load
 
 # --- Configuration ---
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3"
@@ -19,9 +22,13 @@ DATASET_NAME = "davidpirkl/riscv-instruction-specification"
 ADAPTER_FILE = "adapters.npz"
 TOKENIZER_CONFIG = {"trust_remote_code": True}
 
-print(f"Loading model: {MODEL_NAME}")
-# MLX handles 4-bit quantization natively with tokenizer_config
+load_dotenv()  # Load optional HF_TOKEN and other overrides from a local .env
+
+print(f"Loading tokenizer for formatting: {MODEL_NAME}")
+# We only need the tokenizer for data prep, not the full model yet
+# But mlx_lm.load returns both. We'll unload the model to save RAM for training.
 model, tokenizer = load(MODEL_NAME, tokenizer_config=TOKENIZER_CONFIG)
+del model # Free up memory
 
 # --- 1. Prepare Dataset for MLX ---
 # MLX expects a specific format (ChatML or simple text). 
@@ -60,32 +67,33 @@ with open("valid.jsonl", "w") as f:
     for line in val_data:
         json.dump(line, f); f.write('\n')
 
-# --- 2. Freeze Model & Convert to LoRA ---
-# Freezes the main model and adds LoRA adapters to linear layers
-model.freeze()
-linear_to_lora_layers(model, list(range(len(model.layers))), {"q_proj", "v_proj"}, r=16, alpha=16)
-
-# --- 3. Training ---
+# --- 2. Training ---
 print("Starting training on Metal (M4)...")
 
-# MLX's train function is very efficient
-train(
-    model=model,
-    tokenizer=tokenizer,
-    optimizer=None, # Default optimizer
-    train_dataset="train.jsonl",
-    valid_dataset="valid.jsonl",
-    max_seq_length=512,
-    batch_size=4,       # Adjust based on your RAM (4 is usually safe for 7B on 16GB RAM)
-    iters=600,          # 600 iterations is roughly 1 epoch for 2k rows with batch size 4
-    learning_rate=1e-5,
-    steps_per_eval=50,
-    adapter_file=ADAPTER_FILE, # Saves the LoRA weights here
-)
+# We use subprocess to call mlx_lm.lora directly.
+# This avoids internal API instability and manages memory better.
+# We target all linear layers for better quality.
+cmd = [
+    sys.executable, "-m", "mlx_lm.lora",
+    "--model", MODEL_NAME,
+    "--train",
+    "--data", ".", # Directory containing train.jsonl and valid.jsonl
+    "--batch-size", "4",
+    "--lora-layers", "16", # Number of layers to adapt (default is -1 for all, but let's be explicit or use default)
+    "--target-modules", "q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj",
+    "--iters", "600",
+    "--learning-rate", "1e-5",
+    "--steps-per-eval", "50",
+    "--adapter-path", ADAPTER_FILE,
+    "--save-every", "100",
+]
+
+print(f"Running command: {' '.join(cmd)}")
+subprocess.run(cmd, check=True)
 
 print("Training complete. Adapters saved to", ADAPTER_FILE)
 
-# --- 4. Test Inference ---
+# --- 3. Test Inference ---
 print("\n--- Testing Inference ---")
 # We reload the model with the adapters we just trained
 model, tokenizer = load(MODEL_NAME, adapter_path=ADAPTER_FILE, tokenizer_config=TOKENIZER_CONFIG)
