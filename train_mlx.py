@@ -5,6 +5,7 @@
 #     "mlx-lm",
 #     "datasets",
 #     "python-dotenv",
+#     "sentencepiece",
 # ]
 # ///
 
