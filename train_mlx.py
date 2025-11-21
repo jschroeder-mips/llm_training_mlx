@@ -77,18 +77,17 @@ config_content = f"""
 model: {MODEL_NAME}
 train: true
 data: .
-batch_size: 4
+batch_size: 2
 iters: 600
 learning_rate: 1e-5
 steps_per_eval: 50
 adapter_path: {ADAPTER_FILE}
 save_every: 100
-num_layers: -1  # -1 means all layers
 lora_parameters:
   rank: 16
   alpha: 16
   dropout: 0.0
-  keys: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+  scale: 16.0
 """
 
 with open("lora_config.yaml", "w") as f:

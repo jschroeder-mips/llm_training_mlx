@@ -20,9 +20,10 @@
 
 ## Model & Training Workflow
 - Training uses `mlx_lm.lora` via subprocess to ensure stability and correct memory management.
-- LoRA adapters target all linear layers (`q_proj`, `v_proj`, `k_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) with `r=16`, `alpha=16`.
-- Training params: `batch_size=4`, `iters=600`, `learning_rate=1e-5`, `steps_per_eval=50`, `save_every=100`.
-- Script dynamically generates `lora_config.yaml` from the config template before launching training subprocess.
+- LoRA configuration: `rank=16`, `alpha=16`, `scale=16.0`, `dropout=0.0` (auto-detects linear layers to apply adapters).
+- Training params: `batch_size=2`, `iters=600`, `learning_rate=1e-5`, `steps_per_eval=50`, `save_every=100`.
+- Script dynamically generates `lora_config.yaml` from template; **must include `scale` parameter** to avoid KeyError.
+- Results in ~21M trainable parameters (0.29% of 7.2B total); if `Trainable parameters: 0.000%`, check LoRA config.
 - Adapters are persisted to `adapters.npz/`; downstream code must pass `adapter_path=ADAPTER_FILE` when reloading.
 
 ## Inference & Validation

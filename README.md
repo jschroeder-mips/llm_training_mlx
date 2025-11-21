@@ -70,16 +70,34 @@ uv run train_mlx.py
 The script performs the following steps automatically:
 - Downloads `davidpirkl/riscv-instruction-specification` from Hugging Face.
 - Formats prompts with the Mistral chat template and writes `train.jsonl` / `valid.jsonl`.
-- Freezes the base model, applies LoRA adapters to `q_proj` and `v_proj`, and trains for 600 iterations.
-- Saves adapters to `adapters.npz` and executes a quick inference smoke test.
+- Freezes the base model, applies LoRA adapters (rank=16, alpha=16, scale=16.0) to linear layers, and trains for 600 iterations.
+- Saves adapters to `adapters.npz/` and executes a quick inference smoke test.
 
-Artifacts (`train.jsonl`, `valid.jsonl`, `adapters.npz`) are written to the repository root. Re-run `uv run train_mlx.py` any time to regenerate them.
+Training uses `batch_size=2` to fit within M4 memory constraints (~16GB peak). Intermediate checkpoints are saved every 100 iterations. Final training loss: ~0.94.
+
+Artifacts (`train.jsonl`, `valid.jsonl`, `adapters.npz/`) are written to the repository root. Re-run `uv run train_mlx.py` any time to regenerate them.
 
 ## Troubleshooting
 - **Hugging Face auth errors**: re-run `uv run huggingface-cli login` and ensure the `HF_TOKEN` environment variable is set.
-- **Memory pressure**: lower `batch_size` inside the script first, then reduce LoRA rank (`r`) if necessary.
+- **Memory pressure**: training uses `batch_size=2` for M4 MacBooks. If OOM still occurs, reduce LoRA rank in `train_mlx.py`.
 - **Fresh start**: clear the Hugging Face cache at `~/.cache/huggingface` or `%USERPROFILE%\.cache\huggingface` if downloads become corrupted.
 
+## Inference
+Load the fine-tuned model interactively:
+
+```bash
+uv run inference.py
+```
+
+The model expects queries in the format used during training:
+- **Correct**: "Adds the values in rs1 and rs2, stores the result in rd"
+- **Output**: `add rd, rs1, rs2`
+
+Example queries:
+- "Subtracts the value in rs2 from rs1, stores the result in rd"
+- "Loads a word from memory at address rs1 into rd"
+- "Multiplies the values in two registers (rs1, rs2) and stores the result in rd"
+
 ## Next Steps
-- Load `adapters.npz` with `mlx_lm.load(..., adapter_path="adapters.npz")` to run inference against the fine-tuned assistant.
+- Load `adapters.npz/` with `mlx_lm.load(..., adapter_path="adapters.npz")` to run inference against the fine-tuned assistant.
 - Customize dataset splits or evaluation logic by editing `train_mlx.py`.
