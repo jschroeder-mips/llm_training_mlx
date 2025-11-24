@@ -1,0 +1,43 @@
+{
+    "adapter_path": "adapters/phi3_pirate/adapters.npz",
+    "batch_size": 2,
+    "config": "configs/lora_config_phi3_pirate.yaml",
+    "data": "data",
+    "fine_tune_type": "lora",
+    "grad_accumulation_steps": 1,
+    "grad_checkpoint": false,
+    "iters": 500,
+    "learning_rate": 1e-05,
+    "lora_parameters": {
+        "rank": 16,
+        "alpha": 16,
+        "dropout": 0.0,
+        "scale": 16.0
+    },
+    "lr_schedule": null,
+    "mask_prompt": false,
+    "max_seq_length": 2048,
+    "model": "microsoft/Phi-3-mini-4k-instruct",
+    "num_layers": 16,
+    "optimizer": "adam",
+    "optimizer_config": {
+        "adam": {},
+        "adamw": {},
+        "muon": {},
+        "sgd": {},
+        "adafactor": {}
+    },
+    "project_name": null,
+    "report_to": null,
+    "resume_adapter_file": null,
+    "save_every": 100,
+    "seed": 0,
+    "steps_per_eval": 50,
+    "steps_per_report": 10,
+    "test": false,
+    "test_batches": 500,
+    "train": true,
+    "train_file": "train_phi3_pirate.jsonl",
+    "val_batches": 25,
+    "valid_file": "valid_phi3_pirate.jsonl"
+}

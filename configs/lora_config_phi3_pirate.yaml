@@ -1,0 +1,17 @@
+
+model: microsoft/Phi-3-mini-4k-instruct
+train: true
+data: data
+train_file: train_phi3_pirate.jsonl
+valid_file: valid_phi3_pirate.jsonl
+batch_size: 2
+iters: 500
+learning_rate: 1e-5
+steps_per_eval: 50
+adapter_path: adapters/phi3_pirate/adapters.npz
+save_every: 100
+lora_parameters:
+  rank: 16
+  alpha: 16
+  dropout: 0.0
+  scale: 16.0
