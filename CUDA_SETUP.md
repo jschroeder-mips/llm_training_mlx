@@ -159,6 +159,12 @@ pip install torch>=2.0.0 transformers>=4.34.0 peft>=0.5.0 datasets>=2.14.0 bitsa
 python train_cuda.py
 ```
 
+**Output Location:**
+All training artifacts are organized into directories:
+- `data/train.jsonl`, `data/valid.jsonl`: Formatted datasets
+- `adapters/mistral_cuda/`: LoRA adapter checkpoints
+- `adapters/mistral_cuda/final/`: Final trained adapters
+
 **What happens:**
 1. Checks GPU availability
 2. Downloads dataset (~1MB)
@@ -214,10 +220,10 @@ python inference_cuda.py
 Or specify adapter path:
 ```bash
 # With uv
-uv run inference_cuda.py --adapter_path ./adapters_cuda/final
+uv run inference_cuda.py --adapter_path ./adapters/mistral_cuda/final
 
 # Or with python
-python inference_cuda.py --adapter_path ./adapters_cuda/final
+python inference_cuda.py --adapter_path ./adapters/mistral_cuda/final
 ```
 
 **Example session:**

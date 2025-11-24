@@ -41,7 +41,7 @@ Training billions of parameters is expensive. **LoRA** is a clever trick that ma
 
 **Analogy**: Instead of rewriting an entire encyclopedia for a specialized topic, you're adding sticky notes with corrections and additions. The original stays intact, but readers see the modified version.
 
-**What you'll find in `adapters.npz/`:**
+**What you'll find in `adapters/mistral/adapters.npz/`:**
 - `adapters.safetensors` (80MB) - The trained LoRA weights
 - `adapter_config.json` - Metadata about the LoRA configuration (rank, alpha, target layers)
 
@@ -55,7 +55,7 @@ The base Mistral model (~14GB) downloads separately from Hugging Face and is cac
 ┌─────────────────────────────────────────────────────────────┐
 │ 1. DATA PREPARATION (train_mlx.py)                         │
 │    Download RISC-V dataset → Format with chat template     │
-│    → Split into train.jsonl + valid.jsonl                  │
+│    → Split into data/train.jsonl + data/valid.jsonl        │
 └─────────────────────────────────────────────────────────────┘
                             ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -94,7 +94,7 @@ The base Mistral model (~14GB) downloads separately from Hugging Face and is cac
 **`train_mlx.py`** - The complete training pipeline:
 1. Downloads `davidpirkl/riscv-instruction-specification` dataset
 2. Formats each example as a conversation (user describes operation → assistant provides instruction)
-3. Generates `lora_config.yaml` with training parameters
+3. Generates `configs/lora_config.yaml` with training parameters
 4. Launches MLX's LoRA training via subprocess
 5. Tests the trained model with a sample query
 
@@ -104,18 +104,18 @@ The base Mistral model (~14GB) downloads separately from Hugging Face and is cac
 - Generates RISC-V assembly instructions
 - Uses the same chat template format as training
 
-**Training Data (`train.jsonl` / `valid.jsonl`)**:
+**Training Data (`data/train.jsonl` / `data/valid.jsonl`)**:
 Each line is a JSON object with a `text` field containing a formatted conversation:
 ```
 <s>[INST] Write the RISC-V assembly instruction for the following operation:
 Adds the values in rs1 and rs2, stores the result in rd.[/INST] add rd, rs1, rs2</s>
 ```
 
-**Adapters (`adapters.npz/`)**:
+**Adapters (`adapters/mistral/adapters.npz/`)**:
 - `adapters.safetensors` - The learned LoRA weights (80MB)
 - `adapter_config.json` - Configuration metadata
 
-**`lora_config.yaml`** (auto-generated):
+**`configs/lora_config.yaml`** (auto-generated):
 Training hyperparameters including model path, batch size, learning rate, LoRA rank/alpha/scale, and target modules.
 
 ## Prerequisites
@@ -213,7 +213,7 @@ uv run train_mlx.py
 
 2. **Format Data** (~10 seconds)
    - Converts each example to chat format using Mistral's template
-   - Creates `train.jsonl` (531 examples) and `valid.jsonl` (59 examples)
+   - Creates `data/train.jsonl` (531 examples) and `data/valid.jsonl` (59 examples)
    - Each line: `{"text": "<s>[INST] prompt [/INST] response</s>"}`
 
 3. **Load Base Model** (~30 seconds, first run only)
@@ -239,17 +239,17 @@ uv run train_mlx.py
 **Training Output Example:**
 ```
 Iter 100: Train loss 1.523, Learning Rate 1.000e-05, It/sec 0.621, Peak mem 17.2 GB
-Iter 100: Saved adapter weights to adapters.npz/adapters.safetensors
+Iter 100: Saved adapter weights to adapters/mistral/adapters.npz/adapters.safetensors
 ...
 Iter 600: Train loss 0.944, Learning Rate 1.000e-05, It/sec 0.643, Peak mem 17.6 GB
-Training complete. Adapters saved to adapters.npz
+Training complete. Adapters saved to adapters/mistral/adapters.npz
 ```
 
 **Artifacts created:**
-- `train.jsonl` / `valid.jsonl` - Formatted training data (490KB + 57KB)
-- `lora_config.yaml` - Training configuration
-- `adapters.npz/adapters.safetensors` - Trained LoRA weights (80MB)
-- `adapters.npz/adapter_config.json` - Adapter metadata
+- `data/train.jsonl` / `data/valid.jsonl` - Formatted training data (490KB + 57KB)
+- `configs/lora_config.yaml` - Training configuration
+- `adapters/mistral/adapters.npz/adapters.safetensors` - Trained LoRA weights (80MB)
+- `adapters/mistral/adapters.npz/adapter_config.json` - Adapter metadata
 
 ## Inference
 

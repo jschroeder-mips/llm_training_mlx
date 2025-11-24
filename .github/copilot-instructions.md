@@ -37,5 +37,11 @@
 
 ## File Landmarks
 - `train_mlx.py` encapsulates the entire pipeline: dataset prep, LoRA injection, training, and inference sanity check.
+- `train_phi3.py` provides training for Microsoft Phi-3-mini (3.8B params), smaller and faster than Mistral-7B.
+- `train_cuda.py` is the PyTorch/CUDA equivalent for NVIDIA GPUs with 4-bit quantization.
 - `AGENT.md` captures high-level goals and hardware constraints; align any new guidance with its statements.
-- Expect artifacts `train.jsonl`, `valid.jsonl`, `lora_config.yaml`, and `adapters.npz/` to appear in the repo root after training; scripts should reference these paths explicitly.
+- Repository uses organized structure:
+  - `data/` contains generated JSONL training files (gitignored)
+  - `adapters/{model}/` contains trained LoRA weights organized by model
+  - `configs/` contains YAML configuration files for training runs
+- Scripts automatically create necessary directories and save artifacts to appropriate locations.

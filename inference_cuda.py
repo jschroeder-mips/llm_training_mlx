@@ -17,7 +17,7 @@ interface for generating RISC-V assembly instructions.
 
 Usage:
     uv run inference_cuda.py
-    uv run inference_cuda.py --adapter_path ./adapters_cuda/final
+    uv run inference_cuda.py --adapter_path ./adapters/mistral_cuda/final
 """
 
 import argparse
@@ -28,7 +28,7 @@ from dotenv import load_dotenv
 
 # Configuration
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3"
-DEFAULT_ADAPTER_PATH = "./adapters_cuda/final"
+DEFAULT_ADAPTER_PATH = "./adapters/mistral_cuda/final"
 
 load_dotenv()
 

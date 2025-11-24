@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 # Configuration
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3"
-ADAPTER_FILE = "adapters.npz"
+ADAPTER_FILE = "adapters/mistral/adapters.npz"
 TOKENIZER_CONFIG = {"trust_remote_code": True}
 
 load_dotenv()

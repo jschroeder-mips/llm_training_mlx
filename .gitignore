@@ -207,10 +207,14 @@ marimo/_lsp/
 __marimo__/
 
 # MLX / Training artifacts
-lora_config.yaml
+# Data files (generated during training)
+data/*.jsonl
 
 # Training checkpoints (keep only final adapters)
-adapters.npz/0*_adapters.safetensors
+adapters/**/0*_adapters.safetensors
+adapters/**/0*_adapters.npz
+
+# Configs are kept in git for reference
 
 # macOS
 .DS_Store

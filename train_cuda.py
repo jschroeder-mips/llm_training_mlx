@@ -53,9 +53,9 @@ from transformers import (
 # --- Configuration ---
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3"
 DATASET_NAME = "davidpirkl/riscv-instruction-specification"
-OUTPUT_DIR = "./adapters_cuda"
-TRAIN_FILE = "train.jsonl"
-VALID_FILE = "valid.jsonl"
+OUTPUT_DIR = "./adapters/mistral_cuda"
+TRAIN_FILE = "data/train.jsonl"
+VALID_FILE = "data/valid.jsonl"
 
 # Load environment variables (HF_TOKEN)
 load_dotenv()
